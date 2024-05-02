@@ -5,13 +5,9 @@ module.exports = {
     await queryInterface.createTable('users', {
       uuid: {
         type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4,
-      },
-      id: {
+        defaultValue: Sequelize.UUID,
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
       },
       name: {
         type: Sequelize.STRING,
@@ -24,8 +20,30 @@ module.exports = {
         unique: true,
       },
       role: {
-        type: Sequelize.ENUM('user', 'admin'),
+        type: Sequelize.ENUM('reader', 'admin', 'writer'),
         allowNull: false,
+        defaultValue: 'reader',
+      },
+      password: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        validate: {
+          notNull: { msg: 'password cannot be null' },
+          notEmpty: { msg: 'password cannot be empty' },
+        },
+      },
+      active: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
+      },
+      passwordResetToken: {
+        type: Sequelize.STRING,
+      },
+      passwordResetExpires: {
+        type: Sequelize.DATE,
+      },
+      passwordChangedAt: {
+        type: Sequelize.DATE,
       },
       createdAt: {
         allowNull: false,

@@ -1,5 +1,5 @@
 'use strict';
-const { Model } = require('sequelize');
+const { Model, Sequelize } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Post extends Model {
     /**
@@ -9,9 +9,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsTo(models.User, {
-        foreignKey: 'createdBy',
-        as: 'user',
+      this.belongsTo(models.Blog, {
+        foreignKey: 'blogId',
+        as: 'blog',
       });
     }
 
@@ -21,15 +21,10 @@ module.exports = (sequelize, DataTypes) => {
   }
   Post.init(
     {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: DataTypes.INTEGER,
-      },
       uuid: {
-        type: DataTypes.UUID,
+        type: DataTypes.UUIDV4,
         defaultValue: DataTypes.UUIDV4,
+        primaryKey: true,
       },
       title: {
         type: DataTypes.STRING,
@@ -47,12 +42,16 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      createdBy: {
+      blogId: {
+        type: DataTypes.UUIDV4,
+        allowNull: false,
+      },
+      state: {
+        type: DataTypes.ENUM('draft', 'published'),
+        defaultValue: 'draft',
+      },
+      readCount: {
         type: DataTypes.INTEGER,
-        references: {
-          model: 'User',
-          key: 'id',
-        },
       },
     },
     {

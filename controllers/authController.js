@@ -5,14 +5,14 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 require('dotenv').config({ path: `${process.cwd()}/.env` });
 
-const signToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
+const signToken = (uuid) => {
+  return jwt.sign({ uuid }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   }); // the payload(an object containing data),the jwt secret, options.
 };
 
 const createSendToken = (user, statusCode, res) => {
-  const token = signToken(user.id);
+  const token = signToken(user.uuid);
   const cookieOptions = {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
@@ -96,7 +96,7 @@ const protect = catchAsync(async (req, res, next) => {
 
   //3) Check if user still exists
 
-  const freshUser = await User.findByPk(decoded.id);
+  const freshUser = await User.findByPk(decoded.uuid);
 
   if (!freshUser) {
     return next(

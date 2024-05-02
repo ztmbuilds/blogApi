@@ -3,15 +3,11 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('posts', {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER,
-      },
+    
       uuid: {
         type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4,
+        defaultValue: Sequelize.UUID,
+        primaryKey: true,
       },
       title: {
         type: Sequelize.STRING,
@@ -29,13 +25,17 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      createdBy: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'users',
-          key: 'id',
-        },
-      },
+     blogId:{
+       type:Sequelize.UUID,
+       allowNull:false
+     },
+     state:{
+       type: Sequelize.ENUM('draft', 'published'),
+       defaultValue:'draft'
+     },
+     readCount:{
+       type: Sequelize.INTEGER
+     },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
