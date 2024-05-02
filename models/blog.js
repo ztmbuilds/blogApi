@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
 
       this.hasMany(models.Post, {
         foreignKey: 'blogId',
-        as: 'blog',
+        as: 'posts',
       });
     }
   }
@@ -41,6 +41,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: 'Blog',
+      tableName: 'blogs',
     }
   );
   return Blog;

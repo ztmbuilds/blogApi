@@ -1,8 +1,9 @@
 'use strict';
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Blogs', {
+    await queryInterface.createTable('blogs', {
       uuid: {
         allowNull: false,
         defaultValue: Sequelize.UUIDV4,
@@ -13,12 +14,17 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+
+      description: {
+        type: Sequelize.STRING,
+      },
       owner: {
         type: Sequelize.UUID,
         allowNull: false,
-      },
-      description: {
-        type: Sequelize.STRING,
+        references: {
+          model: 'users',
+          key: 'uuid',
+        },
       },
       createdAt: {
         allowNull: false,
@@ -29,8 +35,20 @@ module.exports = {
         type: Sequelize.DATE,
       },
     });
+
+    await queryInterface.addConstraint('blogs', {
+      fields: ['owner'],
+      type: 'foreign key',
+      name: 'FK_Blog_User',
+      references: {
+        table: 'users',
+        field: 'uuid',
+      },
+    });
   },
+
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Blogs');
+    await queryInterface.removeConstraint('blogs', 'FK_Blog_User');
+    await queryInterface.dropTable('blogs');
   },
 };

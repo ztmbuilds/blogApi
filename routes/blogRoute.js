@@ -13,4 +13,6 @@ router.post(
   blogController.createBlog
 );
 
+router.get('/:uuid', blogController.getBlog);
+
 module.exports = router;
