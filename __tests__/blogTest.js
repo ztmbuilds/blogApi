@@ -76,10 +76,12 @@ describe('GET /blogs/', () => {
   });
 });
 
+const uuid = '9e909562-3bd3-4125-ad4e-977eabacfe3b';
+
 describe('GET /blogs/:uuid', () => {
   it('Gets a blog and the posts', () => {
     return request(app)
-      .get('/api/blogs/6184d041-f2c4-4bbc-abd7-68e75e6f0622') //use valid blog_uuid
+      .get(`/api/blogs/${uuid}`) //use valid blog_uuid
       .set('Authorization', `Bearer ${token()}`)
       .expect(200)
       .then((response) => {
@@ -91,13 +93,35 @@ describe('GET /blogs/:uuid', () => {
 describe('PATCH /blogs/:uuid', () => {
   it('Updates a blog', () => {
     return request(app)
-      .patch('/api/blogs/6184d041-f2c4-4bbc-abd7-68e75e6f0622')
+      .patch(`/api/blogs/${uuid}`)
       .set('Authorization', `Bearer ${token()}`)
       .expect('Content-Type', /json/)
       .send({ title: 'new title', description: 'new description' })
       .expect(200)
       .then((response) => {
         expect(response.body.status).toBe('success');
+      });
+  });
+});
+
+describe('DELETE /blogs/:uuid', () => {
+  it('Deletes a blog', () => {
+    return request(app)
+      .delete(`/api/blogs/${uuid}`)
+      .set('Authorization', `Bearer ${token()}`)
+      .expect(204)
+      .then((response) => {
+        expect(response.body).toEqual({});
+      });
+  });
+
+  it('Returns an error message when trying to delete a blog that has been deleted', () => {
+    return request(app)
+      .delete(`/api/blogs/${uuid}`)
+      .set('Authorization', `Bearer ${token()}`)
+      .expect(404)
+      .then((response) => {
+        expect(response.body.status).toBe('fail');
       });
   });
 });

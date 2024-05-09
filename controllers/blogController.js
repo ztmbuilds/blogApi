@@ -77,3 +77,25 @@ exports.updateBlog = catchAsync(async (req, res, next) => {
     data: blog,
   });
 });
+
+exports.deleteBlog = catchAsync(async (req, res, next) => {
+  const { uuid } = req.params;
+  const user = req.user;
+
+  const blog = await Blog.findByPk(uuid);
+
+  if (!blog) {
+    return next(new AppError('Blog not found', 404));
+  }
+  if (user.uuid !== blog.owner) {
+    return next(
+      new AppError('You cannot delete the blog as you are not the owner', 403)
+    );
+  }
+
+  await blog.destroy();
+
+  return res.status(204).json({
+    status: 'success',
+  });
+});

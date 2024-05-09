@@ -12,4 +12,5 @@ const updateBlog = Joi.object({
 
 module.exports = {
   createBlog,
+  updateBlog,
 };
