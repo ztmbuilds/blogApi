@@ -6,13 +6,18 @@ const blogSchema = require('../validation/blogSchema');
 
 router = express.Router();
 
-router.post(
-  '/',
-  authController.protect,
-  validate(blogSchema.createBlog),
-  blogController.createBlog
-);
+router
+  .route('/')
+  .get(blogController.getAllBlogs)
+  .post(
+    authController.protect,
+    validate(blogSchema.createBlog),
+    blogController.createBlog
+  );
 
-router.get('/:uuid', blogController.getBlog);
+router
+  .route('/:uuid')
+  .get(blogController.getBlog)
+  .patch(authController.protect, blogController.updateBlog);
 
 module.exports = router;

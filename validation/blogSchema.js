@@ -5,6 +5,11 @@ const createBlog = Joi.object({
   description: Joi.string().required(),
 });
 
+const updateBlog = Joi.object({
+  title: Joi.string(),
+  description: Joi.string(),
+});
+
 module.exports = {
   createBlog,
 };

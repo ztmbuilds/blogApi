@@ -63,6 +63,19 @@ describe('POST /blogs', () => {
   });
 });
 
+describe('GET /blogs/', () => {
+  it('Gets all blogs', () => {
+    return request(app)
+      .get('/api/blogs/')
+      .set('Authorization', `Bearer ${token()}`)
+      .expect(200)
+      .then((response) => {
+        expect(response.body.status).toBe('success');
+        expect(Array.isArray(response.body.data.rows)).toBe(true);
+      });
+  });
+});
+
 describe('GET /blogs/:uuid', () => {
   it('Gets a blog and the posts', () => {
     return request(app)
@@ -70,7 +83,21 @@ describe('GET /blogs/:uuid', () => {
       .set('Authorization', `Bearer ${token()}`)
       .expect(200)
       .then((response) => {
-        expect(response.body.status);
+        expect(response.body.status).toBe('success');
+      });
+  });
+});
+
+describe('PATCH /blogs/:uuid', () => {
+  it('Updates a blog', () => {
+    return request(app)
+      .patch('/api/blogs/6184d041-f2c4-4bbc-abd7-68e75e6f0622')
+      .set('Authorization', `Bearer ${token()}`)
+      .expect('Content-Type', /json/)
+      .send({ title: 'new title', description: 'new description' })
+      .expect(200)
+      .then((response) => {
+        expect(response.body.status).toBe('success');
       });
   });
 });
