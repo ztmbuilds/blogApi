@@ -1,4 +1,4 @@
-const { User } = require('../models');
+const { User, Blog } = require('../models');
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
 const catchAsync = require('../utils/catchAsync');
@@ -96,7 +96,9 @@ const protect = catchAsync(async (req, res, next) => {
 
   //3) Check if user still exists
 
-  const freshUser = await User.findByPk(decoded.uuid);
+  const freshUser = await User.findByPk(decoded.uuid, {
+    include: { model: Blog, as: 'blog' },
+  });
 
   if (!freshUser) {
     return next(
@@ -136,4 +138,5 @@ module.exports = {
   login,
   protect,
   restrictTo,
+  signToken,
 };

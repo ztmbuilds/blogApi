@@ -6,6 +6,7 @@ const validate = (schema) => async (req, res, next) => {
     await schema.validateAsync(body);
     next();
   } catch (err) {
+    console.log(err);
     console.log(err.details);
     next(new AppError(err.details[0].message, 406));
   }
