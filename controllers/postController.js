@@ -26,8 +26,8 @@ const createPost = catchAsync(async (req, res, next) => {
 const getAllPosts = catchAsync(async (req, res, next) => {
   const posts = await Post.findAndCountAll({
     include: {
-      model: User,
-      as: 'user',
+      model: Blog,
+      as: 'blog',
     },
   });
 
@@ -37,7 +37,51 @@ const getAllPosts = catchAsync(async (req, res, next) => {
   });
 });
 
+const getPost = catchAsync(async (req, res, next) => {
+  const postuuid = req.params.uuid;
+
+  const post = await Post.findByPk(postuuid, {
+    include: {
+      model: Blog,
+      as: 'blog',
+    },
+  });
+
+  if (!post) {
+    return next(new AppError('Post not found', 404));
+  }
+
+  post.readCount += 1;
+  await post.save();
+
+  res.status(200).json({
+    status: 'success',
+    data: post,
+  });
+});
+
+const publishPost = catchAsync(async (req, res, next) => {
+  const postuuid = req.params.uuid;
+
+  const post = await Post.findByPk(postuuid, {
+    include: {
+      model: Blog,
+      as: 'blog',
+    },
+  });
+
+  post.state = 'published';
+  await post.save();
+
+  res.status(200).json({
+    status: 'success',
+    data: post,
+  });
+});
+
 module.exports = {
   createPost,
   getAllPosts,
+  getPost,
+  publishPost,
 };

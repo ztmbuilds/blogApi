@@ -14,4 +14,9 @@ router
     postController.createPost
   );
 
+router
+  .route('/:uuid')
+  .get(postController.getPost)
+  .patch(postController.publishPost);
+
 module.exports = router;
