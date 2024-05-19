@@ -1,4 +1,4 @@
-router = require('express').Router();
+const router = require('express').Router();
 const postController = require('../controllers/postController');
 const authController = require('../controllers/authController');
 const { redisCacheMiddleware } = require('../middlewares/redis');
@@ -10,6 +10,7 @@ router
   .get(postController.getAllPosts)
   .post(
     authController.protect,
+    authController.restrictTo('writer'),
     validate(postSchema),
     postController.createPost
   );
@@ -17,6 +18,18 @@ router
 router
   .route('/:uuid')
   .get(postController.getPost)
-  .patch(postController.publishPost);
+  .patch(
+    authController.protect,
+    authController.restrictTo('writer'),
+    authController.protect,
+    postController.updatePost
+  );
+
+router.patch(
+  '/publish/:uuid',
+  authController.protect,
+  authController.restrictTo('writer'),
+  postController.publishPost
+);
 
 module.exports = router;

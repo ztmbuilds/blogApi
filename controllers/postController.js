@@ -60,8 +60,35 @@ const getPost = catchAsync(async (req, res, next) => {
   });
 });
 
+const updatePost = catchAsync(async (req, res, next) => {
+  const postuuid = req.params.uuid;
+  const { body, user } = req;
+
+  const post = await Post.findByPk(postuuid);
+
+  if (user.blog.uuid !== post.blogId) {
+    return next(new AppError('Only the blog owner can update posts', 403));
+  }
+
+  const updates = {};
+  if (body.title !== undefined) {
+    updates.title = body.title;
+  }
+  if (body.body !== undefined) {
+    updates.body = body.body;
+  }
+
+  await post.update(updates);
+
+  res.status(200).json({
+    status: 'success',
+    data: post,
+  });
+});
+
 const publishPost = catchAsync(async (req, res, next) => {
   const postuuid = req.params.uuid;
+  const user = req.user;
 
   const post = await Post.findByPk(postuuid, {
     include: {
@@ -69,6 +96,10 @@ const publishPost = catchAsync(async (req, res, next) => {
       as: 'blog',
     },
   });
+
+  if (user.blog.uuid !== post.blogId) {
+    return next(new AppError('Only the blog owner can update posts', 403));
+  }
 
   post.state = 'published';
   await post.save();
@@ -78,10 +109,10 @@ const publishPost = catchAsync(async (req, res, next) => {
     data: post,
   });
 });
-
 module.exports = {
   createPost,
   getAllPosts,
   getPost,
   publishPost,
+  updatePost,
 };
