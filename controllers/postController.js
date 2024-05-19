@@ -1,6 +1,7 @@
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const { Post, User, Blog } = require('../models');
+const apiFeatures = require('../utils/apiFeatures');
 
 const createPost = catchAsync(async (req, res, next) => {
   const { user, body } = req;
@@ -24,7 +25,16 @@ const createPost = catchAsync(async (req, res, next) => {
 });
 
 const getAllPosts = catchAsync(async (req, res, next) => {
-  const posts = await Post.findAndCountAll({
+  // Sample Query /api/posts?createdAt_gt=2022-01-01&page=2&pageSize=10&sort=createdAt:desc,title:asc
+
+  const features = apiFeatures(req.query);
+
+  const { count, rows } = await Post.findAndCountAll({
+    where: features.whereClause,
+    order: features.order,
+    offset: features.offset,
+    limit: features.limit,
+    attributes: features.selectedAttributes,
     include: {
       model: Blog,
       as: 'blog',
@@ -33,7 +43,8 @@ const getAllPosts = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: posts,
+    results: count,
+    data: rows,
   });
 });
 

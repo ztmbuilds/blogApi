@@ -3,12 +3,14 @@ const AppError = require('../utils/appError');
 const validate = (schema) => async (req, res, next) => {
   try {
     const { body } = req;
-    await schema.validateAsync(body);
+    console.log(body);
+    await schema.validate(body);
     next();
   } catch (err) {
-    console.log(err);
-    console.log(err.details);
-    next(new AppError(err.details[0].message, 406));
+    // const message =
+    //   err.details && err.details[0] ? err.details[0].message : 'Invalid input';
+    // next(new AppError(message, 406));
+    next(err);
   }
 };
 

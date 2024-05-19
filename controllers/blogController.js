@@ -1,6 +1,7 @@
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
 const { Blog, User, Post } = require('../models');
+const apiFeatures = require('../utils/apiFeatures');
 
 exports.createBlog = catchAsync(async (req, res, next) => {
   const { user, body } = req;
@@ -22,7 +23,15 @@ exports.createBlog = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllBlogs = catchAsync(async (req, res, next) => {
-  const blogs = await Blog.findAndCountAll();
+  const features = apiFeatures(req.query);
+
+  const blogs = await Blog.findAndCountAll({
+    where: features.whereClause,
+    order: features.order,
+    offset: features.offset,
+    limit: features.limit,
+    attributes: features.selectedAttributes,
+  });
 
   return res.status(200).json({
     status: 'success',

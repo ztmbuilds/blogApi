@@ -20,6 +20,10 @@ const handleJWTExpiredError = () => {
   return new AppError('Your token has expired', 401);
 };
 
+const handleParseError = () => {
+  return new AppError('error parsing content of request body ');
+};
+
 const sendErrorDev = (err, res) => {
   console.error('ERROR!', err);
   return res.status(err.statusCode).json({
@@ -61,12 +65,13 @@ module.exports = (err, req, res, next) => {
     sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === 'production') {
     let error = Object.assign(err); //copy of err
-    if (err.name === 'SequelizeUniqueConstraintError')
-      error = handleSequelizeUniqueConstraintError(err);
-    if (err.name === 'SequelizeValidationError')
-      error = handleSequelizeValidationError(err);
+    if (error.name === 'SequelizeUniqueConstraintError')
+      error = handleSequelizeUniqueConstraintError(error);
+    if (error.name === 'SequelizeValidationError')
+      error = handleSequelizeValidationError(error);
     if (error.name === 'JsonWebTokenError') error = handleJWTError();
     if (error.name === 'TokenExpiredError') error = handleJWTExpiredError();
+    if (error.type === 'entity.parse.failed') error = handleParseError();
 
     sendErrorProd(error, res);
   }
