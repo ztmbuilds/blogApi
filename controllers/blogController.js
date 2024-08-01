@@ -2,6 +2,7 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
 const { Blog, User, Post } = require('../models');
 const apiFeatures = require('../utils/apiFeatures');
+const { Op} = require('sequelize');
 
 exports.createBlog = catchAsync(async (req, res, next) => {
   const { user, body } = req;
@@ -106,5 +107,26 @@ exports.deleteBlog = catchAsync(async (req, res, next) => {
 
   return res.status(204).json({
     status: 'success',
+  });
+});
+
+exports.searchBlogs = catchAsync(async (req, res, next) => {
+  const { query } = req.params;
+
+  const blogs = await Blog.findAll({
+    where: {
+      title: {
+        [Op.like]: `%${query}%`,
+      },
+    },
+  });
+
+  if (!blogs) {
+    return next(new AppError("No blogs found", 404));
+  }
+
+  return res.status(200).json({
+    status: "success",
+    data: blogs,
   });
 });
